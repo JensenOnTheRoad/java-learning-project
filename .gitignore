@@ -39,3 +39,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Append ###
+/.idea/intellij-javadocs-4.0.1.xml
