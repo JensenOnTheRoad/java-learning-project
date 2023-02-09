@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    hibernate:
+      #配置自动建表：updata:没有表新建，有表更新操作,控制台显示建表语句
+      ddl-auto: update
+    show-sql: true
+
+
