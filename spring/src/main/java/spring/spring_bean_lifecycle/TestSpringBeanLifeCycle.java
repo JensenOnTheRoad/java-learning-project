@@ -26,13 +26,9 @@ public class TestSpringBeanLifeCycle extends SpringBootTestBase {
 
   // region Test
 
-  @Autowired
-  Person person;
+  @Autowired Person person;
 
-  /**
-   * {@link spring.spring_bean_lifecycle.TestSpringBeanLifeCycle.MyBeanPostProcessor}<{@link
-   * String}>
-   */
+  /** {@link spring.spring_bean_lifecycle.TestSpringBeanLifeCycle.MyBeanPostProcessor} */
   @Test
   @DisplayName("经过自定义的后置处理器")
   void test_post_processor() {
@@ -48,10 +44,10 @@ public class TestSpringBeanLifeCycle extends SpringBootTestBase {
   @Data
   public static class Person
       implements DisposableBean,
-      InitializingBean,
-      ApplicationContextAware,
-      BeanFactoryAware,
-      BeanNameAware {
+          InitializingBean,
+          ApplicationContextAware,
+          BeanFactoryAware,
+          BeanNameAware {
 
     private String name;
 
@@ -68,9 +64,7 @@ public class TestSpringBeanLifeCycle extends SpringBootTestBase {
 
     // region Disposable Bean
 
-    /**
-     * 销毁时获得一次回调
-     */
+    /** 销毁时获得一次回调 */
     @Override
     public void destroy() {
       log.info("Disposable Bean Destroy method of person bean is invoked!");
@@ -79,8 +73,7 @@ public class TestSpringBeanLifeCycle extends SpringBootTestBase {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext)
-        throws BeansException {
-    }
+        throws BeansException {}
 
     // region BeanFactoryAware
     @Override
@@ -112,17 +105,15 @@ public class TestSpringBeanLifeCycle extends SpringBootTestBase {
 
   /**
    * 自定义后置处理器
-   * <p>
-   * 每个Bean初始化时都会执行
+   *
+   * <p>每个Bean初始化时都会执行
    *
    * @author jensen_deng
    */
   @Component
   public static class MyBeanPostProcessor implements BeanPostProcessor {
 
-    /**
-     * 该方法主要针对spring在bean初始化时 调用初始化方法前 进行自定义处理。
-     */
+    /** 该方法主要针对spring在bean初始化时 调用初始化方法前 进行自定义处理。 */
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName)
         throws BeansException {
@@ -134,9 +125,7 @@ public class TestSpringBeanLifeCycle extends SpringBootTestBase {
       return bean;
     }
 
-    /**
-     * 该方法主要针对spring在bean初始化时 调用初始化方法后 进行自定义处理。
-     */
+    /** 该方法主要针对spring在bean初始化时 调用初始化方法后 进行自定义处理。 */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName)
         throws BeansException {
