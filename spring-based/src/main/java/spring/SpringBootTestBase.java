@@ -2,9 +2,10 @@ package spring;
 
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.Ports.Binding;
 import com.google.gson.Gson;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +25,7 @@ import org.testcontainers.utility.DockerImageName;
  *
  * @author jensen_deng
  */
+@Slf4j
 @SpringBootTest(
     classes = StartApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,7 +43,7 @@ public abstract class SpringBootTestBase extends Assertions {
   private static final Integer HOST_MYSQL_DB_PORT = 13306;
 
   // Redis
-  private static final GenericContainer REDIS;
+  private static final GenericContainer<?> REDIS;
   private static final int CONTAINER_REDIS_PORT = 6379;
   private static final int HOST_REDIS_PORT = 16379;
 
@@ -50,31 +52,41 @@ public abstract class SpringBootTestBase extends Assertions {
   */
   static {
     MYSQL_DB =
-        new MySQLContainer<>("mysql:8.0.28")
+        new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
+            .withReuse(true) // 是否开启容器复用
             // 设置映射端口
             .withCreateContainerCmdModifier(
-                cmd ->
-                    cmd.withPortBindings(
-                        new PortBinding(
-                            Ports.Binding.bindPort(HOST_MYSQL_DB_PORT),
-                            new ExposedPort(CONTAINER_MYSQL_DB_PORT))))
+                cmd -> {
+                  Binding hostPort = Binding.bindPort(HOST_MYSQL_DB_PORT);
+                  ExposedPort exposedPort = new ExposedPort(CONTAINER_MYSQL_DB_PORT);
+                  PortBinding binding = new PortBinding(hostPort, exposedPort);
+                  cmd.withPortBindings(binding);
+                })
             // 设置环境参数
             .withEnv(
                 Map.of(
                     "MYSQL_ROOT_PASSWORD",
                     "root_password",
                     "MYSQL_DATABASE",
-                    "petclinic",
+                    "test_db",
                     "MYSQL_USER",
-                    "petclinic",
+                    "test_user",
                     "MYSQL_PASSWORD",
-                    "petclinic"));
+                    "password"));
     MYSQL_DB.start();
 
     REDIS =
-        new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
-            .withExposedPorts(CONTAINER_REDIS_PORT)
-            .withReuse(true);
+        new GenericContainer<>(DockerImageName.parse("redis:5.0.5"))
+            .withReuse(true)
+            .withCreateContainerCmdModifier(
+                cmd ->
+                // 對主機端口和docker中的端口進行綁定，前面的是主機端口，後面的是docker中的端口
+                {
+                  Binding hostPort = Binding.bindPort(HOST_REDIS_PORT);
+                  ExposedPort exposedPort = new ExposedPort(CONTAINER_REDIS_PORT);
+                  PortBinding binding = new PortBinding(hostPort, exposedPort);
+                  cmd.withPortBindings(binding);
+                });
     REDIS.start();
   }
 
