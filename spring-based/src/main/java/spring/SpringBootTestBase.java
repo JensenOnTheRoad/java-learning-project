@@ -35,7 +35,8 @@ import org.testcontainers.utility.DockerImageName;
 // 指定测试文件
 @ActiveProfiles("test")
 public abstract class SpringBootTestBase extends Assertions {
-  protected final Gson gson = new Gson();
+
+  protected static final Gson gson = new Gson();
 
   // MySQL
   private static final MySQLContainer<?> MYSQL_DB;
@@ -47,9 +48,7 @@ public abstract class SpringBootTestBase extends Assertions {
   private static final int CONTAINER_REDIS_PORT = 6379;
   private static final int HOST_REDIS_PORT = 16379;
 
-  /*
-    创建启动容器并指定端口
-  */
+  // 创建启动容器并指定端口
   static {
     MYSQL_DB =
         new MySQLContainer<>(DockerImageName.parse("mysql:8.0.28"))
@@ -59,6 +58,7 @@ public abstract class SpringBootTestBase extends Assertions {
                 cmd -> {
                   Binding hostPort = Binding.bindPort(HOST_MYSQL_DB_PORT);
                   ExposedPort exposedPort = new ExposedPort(CONTAINER_MYSQL_DB_PORT);
+
                   PortBinding binding = new PortBinding(hostPort, exposedPort);
                   cmd.withPortBindings(binding);
                 })
@@ -84,6 +84,7 @@ public abstract class SpringBootTestBase extends Assertions {
                 {
                   Binding hostPort = Binding.bindPort(HOST_REDIS_PORT);
                   ExposedPort exposedPort = new ExposedPort(CONTAINER_REDIS_PORT);
+
                   PortBinding binding = new PortBinding(hostPort, exposedPort);
                   cmd.withPortBindings(binding);
                 });
