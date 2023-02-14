@@ -15,7 +15,7 @@ public class TestSPI {
    *
    * <h1>SPI简单案例</h1>
    *
-   * <p>接口在加载时，会去 resource/META-INF/services 下找接口的全限定名文件，再根据里面的<b>实现类全限定名称</b>加载相应的实现类。
+   * <p>接口在加载时，会去 <b>resource/META-INF/services</b> 下找接口的全限定名文件，再根据里面的<b>实现类全限定名称</b>加载相应的实现类。
    *
    * <p>
    *
