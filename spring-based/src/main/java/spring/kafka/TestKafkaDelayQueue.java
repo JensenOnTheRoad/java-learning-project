@@ -61,7 +61,7 @@ public class TestKafkaDelayQueue {
 
   @Test
   @DisplayName("kafka延迟队列测试")
-  public void test_delay_queue() {
+  void test_delay_queue() {
     // 订阅消息主题
     String topic = "delay-queue";
 
