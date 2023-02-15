@@ -7,11 +7,8 @@ import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
-/**
- * LocalDateTime解析工具
- */
+/** LocalDateTime解析工具 */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LocalDateTimeUtils {
@@ -49,6 +46,7 @@ public class LocalDateTimeUtils {
   }
 
   private static boolean blankVerify(String str, String pattern) {
-    return !StringUtils.hasText(str) || !StringUtils.hasText(pattern);
+    return (str != null && !str.equals("")) || (pattern != null && !pattern.equals(""));
+    //    return !StringUtils.hasText(str) || !StringUtils.hasText(pattern);
   }
 }

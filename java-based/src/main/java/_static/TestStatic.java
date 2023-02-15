@@ -1,20 +1,17 @@
 package _static;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-/**
- * 外部类无法使用static关键字进行修饰
- */
+/** 外部类无法使用static关键字进行修饰 */
 public class TestStatic {
 
-  /**
-   * 静态变量只会在类加载时获取一次内存空间
-   */
-  static List<Integer> list = new ArrayList<>(List.of(0, 1, 2, 3, 4));
+  /** 静态变量只会在类加载时获取一次内存空间 */
+  static List<Integer> list = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4));
 
   /* 初始化静态变量，优先于main()执行。 */
   static {
