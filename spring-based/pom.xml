@@ -22,6 +22,7 @@
     <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
     <hibernate-types-55.version>2.21.1</hibernate-types-55.version>
 
+    <redisson.version>3.19.0</redisson.version>
   </properties>
 
   <dependencyManagement>
@@ -60,10 +61,18 @@
     </dependency>
 
 
+    <!--mysql -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>${mysql-connector-java.version}</version>
+    </dependency>
+
+    <!--redisson-->
+    <dependency>
+      <groupId>org.redisson</groupId>
+      <artifactId>redisson-spring-boot-starter</artifactId>
+      <version>${redisson.version}</version>
     </dependency>
 
     <!--jpa 支持json格式依赖-->
@@ -72,8 +81,6 @@
       <artifactId>hibernate-types-55</artifactId>
       <version>${hibernate-types-55.version}</version>
     </dependency>
-
-    <!--mysql -->
 
 
     <!-- test container -->
