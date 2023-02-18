@@ -59,7 +59,8 @@ class TestFile {
     // 需要解压缩的文件
     String source = getResourceFilePath("temporary" + File.separator + "test.zip");
     // 解压后的目标目录
-    FileUtil.unZipFiles(source, "." + File.separator + "temporary");
+    String descDir = "." + File.separator + "temporary";
+    FileUtil.unZipFiles(source, descDir);
   }
 
   @org.junit.jupiter.api.Test
