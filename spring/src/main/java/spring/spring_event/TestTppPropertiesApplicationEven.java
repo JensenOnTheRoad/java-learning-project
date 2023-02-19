@@ -21,7 +21,7 @@ import spring.SpringBootTestBase;
 /**
  * @author jensen_deng
  */
-public class TestApplicationEven extends SpringBootTestBase {
+public class TestTppPropertiesApplicationEven extends SpringBootTestBase {
 
   // region 测试
 

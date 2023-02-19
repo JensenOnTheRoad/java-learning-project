@@ -22,13 +22,13 @@ import spring.SpringBootTestBase;
  * @author jensen_deng
  */
 @Slf4j
-public class TestSpringBeanLifeCycle extends SpringBootTestBase {
+public class TestTppPropertiesSpringBeanLifeCycle extends SpringBootTestBase {
 
   // region Test
 
   @Autowired Person person;
 
-  /** {@link spring.spring_bean_lifecycle.TestSpringBeanLifeCycle.MyBeanPostProcessor} */
+  /** {@link TestTppPropertiesSpringBeanLifeCycle.MyBeanPostProcessor} */
   @Test
   @DisplayName("经过自定义的后置处理器")
   void test_post_processor() {

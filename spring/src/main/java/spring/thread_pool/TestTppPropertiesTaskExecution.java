@@ -17,7 +17,7 @@ import spring.SpringBootTestBase;
  *
  * @author jensen_deng
  */
-public class TestTaskExecution extends SpringBootTestBase {
+public class TestTppPropertiesTaskExecution extends SpringBootTestBase {
   @Autowired TestTaskExecutionService testTaskExecutionService;
 
   @Test

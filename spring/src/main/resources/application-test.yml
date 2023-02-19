@@ -1,0 +1,10 @@
+server:
+  port: 9999
+
+thirty:
+  tpp:
+    domain: http://gw.api.taobao.com/router/rest
+    app-key: 7890
+    app-secret: 123456
+    user-id: 10000001
+    platform: 199
