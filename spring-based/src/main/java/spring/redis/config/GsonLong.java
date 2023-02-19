@@ -1,4 +1,4 @@
-package base_on_spring.redis;
+package spring.redis.config;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

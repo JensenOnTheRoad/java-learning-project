@@ -1,4 +1,4 @@
-package spring.redis;
+package spring.redis.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,6 +22,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import spring.config.GsonLocalDate;
 import spring.config.GsonLocalDateTime;
+import spring.redis.config.GsonLong;
+import spring.redis.config.PageResult;
 
 /**
  * @author jensen_deng
@@ -35,10 +37,12 @@ public class RedisUtils {
       new GsonBuilder()
           .registerTypeAdapter(LocalDateTime.class, new GsonLocalDateTime())
           .registerTypeAdapter(LocalDate.class, new GsonLocalDate())
-          .registerTypeAdapter(Long.class, new base_on_spring.redis.GsonLong())
+          .registerTypeAdapter(Long.class, new GsonLong())
           .create();
 
-  public <T> T get(String key, Class rawClass, Class... classes) {
+  // region basic
+
+  public <T> T get(String key, Class<?> rawClass, Class<?>... classes) {
     String content = redisTemplate.opsForValue().get(key);
     Type type = TypeToken.getParameterized(rawClass, classes).getType();
     return gson.fromJson(content, type);
@@ -60,6 +64,8 @@ public class RedisUtils {
     redisTemplate.delete(key);
   }
 
+  // endregion
+
   // region scan 使用 scan 命令代替 keys 命令，在大数据量的情况下可以提高查询效率
 
   /**
@@ -68,12 +74,11 @@ public class RedisUtils {
    * @param patternKey 匹配key
    * @param pageIndex 页码
    * @param pageSize 页大小
-   * @return {@link base_on_spring.redis.PageResult}<{@link String}>
+   * @return {@link PageResult}<{@link String}>
    */
   @Generated
-  public base_on_spring.redis.PageResult<String> findKeysForPage(
-      String patternKey, int pageIndex, int pageSize) {
-    base_on_spring.redis.PageResult<String> result = base_on_spring.redis.PageResult.empty();
+  public PageResult<String> findKeysForPage(String patternKey, int pageIndex, int pageSize) {
+    PageResult<String> result = PageResult.empty();
     List<String> keys = new ArrayList<>();
 
     RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
@@ -95,7 +100,7 @@ public class RedisUtils {
         }
         tmpIndex++;
       }
-      result = base_on_spring.redis.PageResult.of(pageIndex, pageSize, keys.size(), keys);
+      result = PageResult.of(pageIndex, pageSize, keys.size(), keys);
       RedisConnectionUtils.releaseConnection(connection, factory);
     } catch (Exception e) {
       log.warn("Redis连接关闭异常，", e);

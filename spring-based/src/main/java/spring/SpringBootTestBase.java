@@ -1,12 +1,14 @@
 package spring;
 
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports.Binding;
 import com.google.gson.Gson;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,7 +62,10 @@ public abstract class SpringBootTestBase extends Assertions {
                   ExposedPort exposedPort = new ExposedPort(CONTAINER_MYSQL_DB_PORT);
 
                   PortBinding binding = new PortBinding(hostPort, exposedPort);
-                  cmd.withPortBindings(binding);
+                  //                  cmd.withPortBindings(binding);
+                  HostConfig hostConfig = cmd.getHostConfig();
+                  assert hostConfig != null;
+                  hostConfig.withPortBindings(binding);
                 })
             // 设置环境参数
             .withEnv(
@@ -109,5 +114,11 @@ public abstract class SpringBootTestBase extends Assertions {
   void test() {
     Assertions.assertThat(MYSQL_DB.isRunning()).isTrue();
     Assertions.assertThat(REDIS.isRunning()).isTrue();
+  }
+
+  @AfterAll
+  static void destroy() {
+    MYSQL_DB.close();
+    REDIS.close();
   }
 }

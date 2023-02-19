@@ -23,8 +23,7 @@ import spring.SpringBootTestBase;
 @Transactional(rollbackFor = Exception.class)
 public class TestRedis extends SpringBootTestBase {
 
-  // 过期时间
-  private static final int REDIS_KEEP_TIME = 1;
+  private static final int REDIS_KEEP_TIME = 1; // 过期时间
   private final Type type = new TypeToken<User>() {}.getType();
   @Autowired private StringRedisTemplate redisTemplate;
 
@@ -35,7 +34,7 @@ public class TestRedis extends SpringBootTestBase {
   public void testRedisTemplateObj() {
     String key = "ZhaoYun";
     if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
-      log.info("缓存%s没有存在", key);
+      log.info("缓存{}没有存在", key);
 
       User user = User.builder().id(1001).name(key).build();
       setCache(key, gson.toJson(user));

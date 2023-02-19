@@ -16,6 +16,7 @@
     <module>spring-based</module>
     <module>java-based</module>
     <module>algorithm</module>
+    <module>no-testing-env</module>
   </modules>
 
   <properties>

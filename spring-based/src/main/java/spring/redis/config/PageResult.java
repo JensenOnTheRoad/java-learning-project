@@ -1,4 +1,4 @@
-package base_on_spring.redis;
+package spring.redis.config;
 
 import java.util.Collections;
 import java.util.List;

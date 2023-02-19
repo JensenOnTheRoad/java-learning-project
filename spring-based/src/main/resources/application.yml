@@ -1,0 +1,10 @@
+spring:
+  cache:
+    type: redis
+  datasource:
+    url: jdbc:mysql://localhost:13306/scm_test
+    password: test
+    username: test
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 30

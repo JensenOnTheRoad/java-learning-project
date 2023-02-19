@@ -21,7 +21,6 @@
     <testcontainers.version>1.17.6</testcontainers.version>
     <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
     <hibernate-types-55.version>2.21.1</hibernate-types-55.version>
-
     <redisson.version>3.19.0</redisson.version>
   </properties>
 
@@ -55,6 +54,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
+    <!-- kafka   -->
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
@@ -74,6 +74,12 @@
       <artifactId>redisson-spring-boot-starter</artifactId>
       <version>${redisson.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.redisson</groupId>
+      <artifactId>redisson-spring-data-27</artifactId>
+      <version>${redisson.version}</version>
+    </dependency>
+
 
     <!--jpa 支持json格式依赖-->
     <dependency>
