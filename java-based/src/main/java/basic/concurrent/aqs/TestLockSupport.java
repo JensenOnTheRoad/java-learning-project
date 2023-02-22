@@ -5,18 +5,18 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.SneakyThrows;
 
-public class Demo_LockSupport {
+public class TestLockSupport {
 
   public static void main(String[] args) {
 
     Lock lock = new ReentrantLock();
     lock.lock();
-    Demo_LockSupport t = new Demo_LockSupport();
+    TestLockSupport t = new TestLockSupport();
     testA(t);
     testB(t);
   }
 
-  private static void testA(Demo_LockSupport t) {
+  private static void testA(TestLockSupport t) {
     Thread threadC = new Thread(() -> t.printC());
     Thread threadB = new Thread(() -> t.printB(threadC));
     Thread threadA = new Thread(() -> t.printA(threadB));
@@ -26,7 +26,7 @@ public class Demo_LockSupport {
     threadC.start();
   }
 
-  private static void testB(Demo_LockSupport t) {
+  private static void testB(TestLockSupport t) {
     Thread threadC_Ex = new Thread(() -> t.printC_Ex());
     Thread threadB_Ex = new Thread(() -> t.printB_Ex(threadC_Ex));
     Thread threadA_Ex = new Thread(() -> t.printA_Ex(threadB_Ex));
