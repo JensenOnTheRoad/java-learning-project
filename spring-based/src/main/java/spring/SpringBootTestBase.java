@@ -9,6 +9,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,7 +63,6 @@ public abstract class SpringBootTestBase extends Assertions {
                   ExposedPort exposedPort = new ExposedPort(CONTAINER_MYSQL_DB_PORT);
 
                   PortBinding binding = new PortBinding(hostPort, exposedPort);
-                  //                  cmd.withPortBindings(binding);
                   HostConfig hostConfig = cmd.getHostConfig();
                   assert hostConfig != null;
                   hostConfig.withPortBindings(binding);
@@ -78,7 +78,6 @@ public abstract class SpringBootTestBase extends Assertions {
                     "test_user",
                     "MYSQL_PASSWORD",
                     "password"));
-    MYSQL_DB.start();
 
     REDIS =
         new GenericContainer<>(DockerImageName.parse("redis:5.0.5"))
@@ -91,9 +90,10 @@ public abstract class SpringBootTestBase extends Assertions {
                   ExposedPort exposedPort = new ExposedPort(CONTAINER_REDIS_PORT);
 
                   PortBinding binding = new PortBinding(hostPort, exposedPort);
-                  cmd.withPortBindings(binding);
+                  HostConfig hostConfig = cmd.getHostConfig();
+                  assert hostConfig != null;
+                  hostConfig.withPortBindings(binding);
                 });
-    REDIS.start();
   }
 
   /** 动态数据源配置 */
@@ -108,6 +108,12 @@ public abstract class SpringBootTestBase extends Assertions {
     // Redis
     registry.add("spring.redis.host", REDIS::getHost);
     registry.add("spring.redis.port", () -> REDIS.getMappedPort(CONTAINER_REDIS_PORT));
+  }
+
+  @BeforeAll
+  static void setUp() {
+    MYSQL_DB.start();
+    REDIS.start();
   }
 
   @Test
