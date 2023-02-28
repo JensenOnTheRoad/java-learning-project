@@ -1,5 +1,6 @@
 package spring.redis;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
@@ -9,24 +10,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
 import spring.SpringBootTestBase;
 
 /**
  * @author jensen_deng
  */
 @Slf4j
-@Transactional(rollbackFor = Exception.class)
 public class TestRedis extends SpringBootTestBase {
+  @Autowired private StringRedisTemplate redisTemplate;
 
   private static final int REDIS_KEEP_TIME = 1; // 过期时间
   private final Type type = new TypeToken<User>() {}.getType();
-  @Autowired private StringRedisTemplate redisTemplate;
+  private Gson gson;
 
+  @BeforeEach
+  void setUp() {
+    gson = getGson();
+  }
   // region RedisTemplate
 
   @Test
