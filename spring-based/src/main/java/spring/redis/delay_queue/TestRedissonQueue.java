@@ -36,11 +36,13 @@ public class TestRedissonQueue extends SpringBootTestBase {
     // 加入队列
     Task task = Task.builder().id(1L).name("test task").expiredTime(LocalDateTime.MAX).build();
     int seconds = 10;
+
     delayedQueue.offer(task, seconds, TimeUnit.SECONDS);
     log.info("(添加延时队列成功) 队列键：{}，队列值：{}，延迟时间：{}", queueKey, task, seconds + "秒");
 
     delayedQueue.offer(task, seconds, TimeUnit.SECONDS);
     log.info("(添加延时队列成功) 队列键：{}，队列值：{}，延迟时间：{}", queueKey, task, seconds + "秒");
+
     // 根据key获取队列
     RBlockingQueue<Object> blockingQueue = redissonClient.getBlockingQueue(queueKey);
     Task task2 = (Task) blockingQueue.take();

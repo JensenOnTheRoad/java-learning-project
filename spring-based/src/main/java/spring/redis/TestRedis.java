@@ -156,11 +156,15 @@ public class TestRedis extends SpringBootTestBase {
     String key = "redisKey";
 
     System.out.println(redisTemplate.opsForValue().get(key));
-    boolean has = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, "666"));
+    boolean has =
+        Boolean.TRUE.equals(
+            redisTemplate.opsForValue().setIfAbsent(key, "666", 10, TimeUnit.MINUTES));
     System.out.println("第一次redisKey没有值，则：" + has);
 
     System.out.println(redisTemplate.opsForValue().get(key));
-    has = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, "999"));
+    has =
+        Boolean.TRUE.equals(
+            redisTemplate.opsForValue().setIfAbsent(key, "999", 10, TimeUnit.MINUTES));
     System.out.println("第二次redisKey有值，则：" + has);
 
     System.out.println(redisTemplate.opsForValue().get(key));

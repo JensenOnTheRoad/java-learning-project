@@ -8,14 +8,15 @@ import com.google.gson.Gson;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -39,7 +40,8 @@ import org.testcontainers.utility.DockerImageName;
 @ActiveProfiles("test")
 public abstract class SpringBootTestBase extends Assertions {
 
-  protected static final Gson gson = new Gson();
+  @Autowired private MockMvc mockMvc;
+  private static final Gson gson = new Gson();
 
   // MySQL
   private static final MySQLContainer<?> MYSQL_DB;
@@ -51,6 +53,13 @@ public abstract class SpringBootTestBase extends Assertions {
   private static final int CONTAINER_REDIS_PORT = 6379;
   private static final int HOST_REDIS_PORT = 16379;
 
+  public Gson getGson() {
+    return gson;
+  }
+
+  public MockMvc getMockMvc() {
+    return mockMvc;
+  }
   // 创建启动容器并指定端口
   static {
     MYSQL_DB =
@@ -122,7 +131,7 @@ public abstract class SpringBootTestBase extends Assertions {
     Assertions.assertThat(REDIS.isRunning()).isTrue();
   }
 
-  @AfterAll
+  //  @AfterAll
   static void destroy() {
     MYSQL_DB.close();
     REDIS.close();
