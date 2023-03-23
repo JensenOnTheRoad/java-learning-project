@@ -1,6 +1,5 @@
 package utils.compress;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Resource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

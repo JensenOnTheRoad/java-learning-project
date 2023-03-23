@@ -12,11 +12,11 @@ public class TestFloat {
 
   @Test
   void test_float() {
-    Assertions.assertThatThrownBy(
+    Assertions.assertThatNoException()
+        .isThrownBy(
             () -> {
               float a = 3.4f;
               log.info(String.valueOf(a));
-            })
-        .doesNotThrowAnyException();
+            });
   }
 }
