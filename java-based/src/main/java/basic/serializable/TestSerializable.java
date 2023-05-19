@@ -1,16 +1,11 @@
 package basic.serializable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,32 +15,41 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 public class TestSerializable {
 
+  private static String path;
+
+  @BeforeAll
+  static void setUp() {
+    path = "temporary/serializable.txt";
+  }
+
   @Test
   @DisplayName("序列化与反序列化")
-  void test_serializable_and_unserializable() {
-    String path = "temporary/serializable.txt";
-
+  void test_serializable() {
     serializable(path);
+  }
+
+  @Test
+  @DisplayName("反序列化")
+  void test_unserializable() {
     unserializable(path);
   }
 
   @SneakyThrows
-  static void serializable(String url) {
+  private static void serializable(String url) {
     String path = createNewFile(url);
-    FileOutputStream fileOut = new FileOutputStream(path);
-    ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-    Person person = Person.builder().name("zhang shan").age(10).password("123456").build();
-    out.writeObject(person);
-    out.close();
-    fileOut.close();
+    try (FileOutputStream fileOut = new FileOutputStream(path);
+        ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+      Person person = Person.builder().name("zhang shan").age(10).password("123456").build();
+      out.writeObject(person);
+    }
   }
 
-  static void unserializable(String url) {
+  private static void unserializable(String url) {
     try (FileInputStream in = new FileInputStream(url);
-        ObjectInputStream oin = new ObjectInputStream(in)) {
+        ObjectInputStream oIn = new ObjectInputStream(in)) {
 
-      Person person = (Person) oin.readObject();
+      Person person = (Person) oIn.readObject();
       log.info("反序列化：\n" + person.toString());
 
     } catch (Exception e) {
@@ -68,8 +72,13 @@ public class TestSerializable {
 @Data
 @Builder
 class Person implements Serializable {
-  private static final long serialVersionUID = 8656128222714547171L;
+
+  @Serial private static final long serialVersionUID = 8656128222714547171L;
+
   private String name;
+
   private int age;
+
+  // transient不会被序列化
   private transient String password;
 }
