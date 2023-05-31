@@ -35,14 +35,13 @@ public class Demo_Thread_Pool {
   private static void manuallyCreateThreadPool() {
 
     // Guava
-
     ExecutorService service =
         new ThreadPoolExecutor(
             10,
             10,
             60L,
             TimeUnit.SECONDS,
-            new ArrayBlockingQueue(10),
+            new ArrayBlockingQueue<>(10),
             new ThreadFactoryBuilder().setNameFormat("thread-pool-%d").build(),
             new ThreadPoolExecutor.AbortPolicy());
 
@@ -89,7 +88,6 @@ public class Demo_Thread_Pool {
   private static void createThreadPool_Callable() {
     /* 固定大小的线程池 */
     ExecutorService service = Executors.newFixedThreadPool(5);
-
     // 创建任务对象
     Callable<Object> task =
         () -> {
