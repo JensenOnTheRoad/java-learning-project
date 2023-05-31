@@ -17,6 +17,7 @@
     <module>java-based</module>
     <module>algorithm</module>
     <module>no-testing-env</module>
+      <module>netty</module>
   </modules>
 
   <properties>
