@@ -4,10 +4,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -30,6 +30,7 @@ public class DemoSyncData {
    * @param total 数据总量
    * @param pageSize 页码
    */
+  @SneakyThrows
   public static void synAllData(int total, int pageSize) {
 
     // 定义原子变量 - 页数
@@ -47,22 +48,31 @@ public class DemoSyncData {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     log.info("【数据同步 - 存量】开始同步时间：{}", beginTime.format(formatter));
 
-    for (int index = 1; index <= times; index++) {
-      fixedThreadPool.submit(
-          () -> {
-            try {
-              multiFetchAndSaveDB(pageIndex.incrementAndGet(), pageSize);
-            } catch (Exception e) {
-              log.error("并发获取并保存数据异常：", e);
-            }
-          });
-    }
+    Callable<Integer> callable =
+        () -> {
+          int index = pageIndex.incrementAndGet();
+          try {
+            multiFetchAndSaveDB(index, pageSize);
+          } catch (Exception e) {
+            log.error("并发获取并保存数据异常：", e);
+          }
+          return index;
+        };
 
-    LocalDateTime endLocalDateTime = LocalDateTime.now();
-    log.info(
-        "【数据同步 - 存量】同步结束时间：{},总共耗时：{}分钟",
-        endLocalDateTime.format(formatter),
-        Duration.between(beginTime, endLocalDateTime).toMinutes());
+    // 提交到线程池
+    for (int i = 1; i <= times; i++) {
+      Future<Integer> task = fixedThreadPool.submit(callable);
+
+      // 判断是否完成
+      if (task.get().equals(times) && task.isDone()) {
+        LocalDateTime endLocalDateTime = LocalDateTime.now();
+        log.info(
+            "【数据同步 - 存量】同步结束时间：{},总共耗时：{}分钟",
+            endLocalDateTime.format(formatter),
+            Duration.between(beginTime, endLocalDateTime).toMinutes());
+        fixedThreadPool.shutdown();
+      }
+    }
   }
 
   /**
@@ -72,17 +82,17 @@ public class DemoSyncData {
    * @param pageSize 页面大小
    */
   private static void multiFetchAndSaveDB(int pageIndex, int pageSize) {
-    log.info("【数据同步 - 存量】，第{}次同步,", pageIndex);
+    log.info("【数据同步 - 存量】，第{}页同步,", pageIndex);
     List<Integer> data = mockGetData(pageIndex, pageSize);
 
     if (!CollectionUtils.isEmpty(data)) {
-      log.info("【数据同步 - 存量】，第{}次同步,同步成功", pageIndex);
+      log.info("【数据同步 - 存量】，第{}页同步,同步成功", pageIndex);
       // TODO save to Database
       if (data.size() < pageSize) {
-        log.info("【数据同步 - 存量】,第{}次同步,获取数据小于每页获取条数,证明已全部同步完毕!!!", pageIndex);
+        log.info("【数据同步 - 存量】,第{}页同步,获取数据小于每页获取条数,证明已全部同步完毕!!!", pageIndex);
       }
     } else {
-      log.info("【数据同步 - 存量】,第{}次同步,获取数据为空,证明已全部同步完毕!!!", pageIndex);
+      log.info("【数据同步 - 存量】,第{}页同步,获取数据为空,证明已全部同步完毕!!!", pageIndex);
     }
   }
 
