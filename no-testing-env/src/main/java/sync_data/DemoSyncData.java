@@ -70,7 +70,39 @@ public class DemoSyncData {
             "【数据同步 - 存量】同步结束时间：{},总共耗时：{}分钟",
             endLocalDateTime.format(formatter),
             Duration.between(beginTime, endLocalDateTime).toMinutes());
-        fixedThreadPool.shutdown();
+        shutdownAndAwaitTermination(fixedThreadPool);
+      }
+    }
+  }
+
+  /**
+   * 线程池关闭并等待终止
+   *
+   * @param pool
+   */
+  private static void shutdownAndAwaitTermination(ExecutorService pool) {
+    // Disable new tasks from being submitted
+    pool.shutdown();
+
+    try {
+      // Wait a while for existing tasks to terminate
+      if (!pool.awaitTermination(30, TimeUnit.SECONDS)) {
+        // Cancel currently executing tasks
+        pool.shutdownNow();
+
+        // Wait a while for tasks to respond to being cancelled
+        if (!pool.awaitTermination(30, TimeUnit.SECONDS)) {
+          log.error("Pool did not terminate");
+        }
+      }
+    } catch (InterruptedException ie) {
+      // (Re-)Cancel if current thread also interrupted
+      pool.shutdownNow();
+      // Preserve interrupt status
+      Thread.currentThread().interrupt();
+    } finally {
+      if (pool.isTerminated()) {
+        log.info("ThreadPool was terminated.");
       }
     }
   }
@@ -86,8 +118,8 @@ public class DemoSyncData {
     List<Integer> data = mockGetData(pageIndex, pageSize);
 
     if (!CollectionUtils.isEmpty(data)) {
-      log.info("【数据同步 - 存量】，第{}页同步,同步成功", pageIndex);
       // TODO save to Database
+      log.info("【数据同步 - 存量】，第{}页同步,同步成功", pageIndex);
       if (data.size() < pageSize) {
         log.info("【数据同步 - 存量】,第{}页同步,获取数据小于每页获取条数,证明已全部同步完毕!!!", pageIndex);
       }
