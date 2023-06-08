@@ -49,7 +49,8 @@ public class Demo_MultiThreadTest {
   static class MyTest {
 
     @Test
-    void test1() throws InterruptedException {
+    @SneakyThrows
+    void test1() {
       Runnable runnable =
           () -> {
             for (int i = 0; i < 1000; i++) {

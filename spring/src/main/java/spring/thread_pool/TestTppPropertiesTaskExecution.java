@@ -1,7 +1,7 @@
 package spring.thread_pool;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -18,13 +18,15 @@ import spring.SpringBootTestBase;
  * @author jensen_deng
  */
 public class TestTppPropertiesTaskExecution extends SpringBootTestBase {
-  @Autowired TestTaskExecutionService testTaskExecutionService;
+  @Autowired TaskExecutionService testTaskExecutionService;
 
   @Test
   @DisplayName("使用自定义的TaskExecute")
-  void test() throws ExecutionException, InterruptedException {
+  @SneakyThrows
+  void test() {
     Future<String> future = testTaskExecutionService.exec();
     String actual = future.get();
+
     Assertions.assertThat(actual).contains("resident_task-thread");
   }
 }

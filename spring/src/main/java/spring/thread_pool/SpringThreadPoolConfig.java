@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * @author jensen_deng
@@ -15,7 +16,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 // 利用@EnableAsync注解开启异步任务支持
 @EnableAsync(proxyTargetClass = true)
 // @ComponentScan({"spring.thread_pool"})// 必须加此注解扫描包
-public class TaskExecutionConfig {
+public class SpringThreadPoolConfig {
+
+  // 固定线程池数
+  private static final Integer MAX_FIXED_THREAD_NUMS = 10;
 
   // 获取当前机器的核数
   public static final int CPU_NUM = Runtime.getRuntime().availableProcessors();
@@ -33,7 +37,7 @@ public class TaskExecutionConfig {
     taskExecutor.setQueueCapacity(500);
     // 当提交的任务个数大于QueueCapacity，就需要设置该参数，但spring提供的都不太满足业务场景，可以自定义一个，也可以注意不要超过QueueCapacity即可
     taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-    taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+    taskExecutor.setWaitForTasksToCompleteOnShutdown(Boolean.TRUE);
     taskExecutor.setAwaitTerminationSeconds(60);
     taskExecutor.setThreadNamePrefix("resident_task-thread");
     taskExecutor.initialize();
@@ -51,9 +55,27 @@ public class TaskExecutionConfig {
     taskExecutor.setQueueCapacity(500);
     // 当提交的任务个数大于QueueCapacity，就需要设置该参数，但spring提供的都不太满足业务场景，可以自定义一个，也可以注意不要超过QueueCapacity即可
     taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-    taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+    taskExecutor.setWaitForTasksToCompleteOnShutdown(Boolean.TRUE);
     taskExecutor.setAwaitTerminationSeconds(60);
-    taskExecutor.setThreadNamePrefix("processor-thread");
+    taskExecutor.setThreadNamePrefix("schedule-thread");
+    taskExecutor.initialize();
+    return taskExecutor;
+  }
+
+  @Bean("fixedTaskExecutor")
+  public Executor fixedTaskExecutor() {
+    ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+    // 核心线程大小
+    taskExecutor.setCorePoolSize(MAX_FIXED_THREAD_NUMS);
+    // 最大线程大小
+    taskExecutor.setMaxPoolSize(MAX_FIXED_THREAD_NUMS);
+    // 队列最大容量
+    taskExecutor.setQueueCapacity(500);
+    // 当提交的任务个数大于QueueCapacity，就需要设置该参数，但spring提供的都不太满足业务场景，可以自定义一个，也可以注意不要超过QueueCapacity即可
+    taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    taskExecutor.setWaitForTasksToCompleteOnShutdown(Boolean.TRUE);
+    taskExecutor.setAwaitTerminationSeconds(60);
+    taskExecutor.setThreadNamePrefix("fixed-thread");
     taskExecutor.initialize();
     return taskExecutor;
   }
