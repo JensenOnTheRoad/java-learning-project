@@ -1,6 +1,5 @@
 package sync_data;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,12 +24,13 @@ public class DemoSyncData {
   public static void main(String[] args) {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
+    // 1000 * 1000时，多线程77s，单线程621s
 
-    // 多线程 624s
-    //    syncDataThroughMultiThead(TOTAL, PAGE_SIZE);
+    // 多线程
+    syncDataThroughMultiThead(TOTAL_NUMBER, PAGE_SIZE);
 
-    // 单线程 621s
-    syncData(0, PAGE_SIZE);
+    // 单线程
+    //    syncData(0, PAGE_SIZE);
 
     stopWatch.stop();
     log.info("Total spend time: {}", stopWatch.getTotalTimeSeconds());
@@ -46,7 +46,6 @@ public class DemoSyncData {
    */
   @SneakyThrows
   public static void syncDataThroughMultiThead(int total, int pageSize) {
-
     // 定义原子变量 - 页数
     AtomicInteger pageIndex = new AtomicInteger(0);
     // 创建线程池
@@ -62,11 +61,14 @@ public class DemoSyncData {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     log.info("【数据同步 - 存量】开始同步时间：{}", beginTime.format(formatter));
 
+    CountDownLatch countDownLatch = new CountDownLatch(times);
+
     Callable<Integer> callable =
         () -> {
           int index = pageIndex.incrementAndGet();
           try {
             multiFetchAndSaveDatabase(index, pageSize);
+            countDownLatch.countDown();
           } catch (Exception e) {
             log.error("并发获取并保存数据异常：", e);
           }
@@ -75,17 +77,14 @@ public class DemoSyncData {
 
     // 提交到线程池
     for (int i = 1; i <= times; i++) {
-      Future<Integer> task = fixedThreadPool.submit(callable);
+      fixedThreadPool.submit(callable);
+    }
 
-      // 判断是否完成
-      if (task.get().equals(times) && task.isDone()) {
-        LocalDateTime endLocalDateTime = LocalDateTime.now();
-        log.info(
-            "【数据同步 - 存量】同步结束时间：{},总共耗时：{}秒",
-            endLocalDateTime.format(formatter),
-            Duration.between(beginTime, endLocalDateTime).toSeconds());
-        shutdownAndAwaitTermination(fixedThreadPool);
-      }
+    // 阻塞等待线程池任务执行完
+    countDownLatch.await();
+
+    if (countDownLatch.getCount() == 0) {
+      shutdownAndAwaitTermination(fixedThreadPool);
     }
   }
 
