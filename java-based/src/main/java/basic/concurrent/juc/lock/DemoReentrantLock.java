@@ -1,6 +1,5 @@
 package basic.concurrent.juc.lock;
 
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.Builder;
@@ -39,10 +38,10 @@ public class DemoReentrantLock {
 
   /**
    * 在公平锁ReentrantLock构造函数中指定公平策略
-   * <p>
-   * 分别测试为true和为false的输出。
-   * <p>
-   * 为true则输出顺序一定是A B C 但是为false的话有可能输出A C B
+   *
+   * <p>分别测试为true和为false的输出。
+   *
+   * <p>为true则输出顺序一定是A B C 但是为false的话有可能输出A C B
    */
   static class FairStrategy {
 
@@ -84,12 +83,11 @@ public class DemoReentrantLock {
     }
   }
 
-
   @Slf4j
   static class NonBlockingAcquireLock {
 
     public static void main(String[] args) {
-//      sync();
+      //      sync();
       reentrantLock();
     }
 
@@ -97,12 +95,18 @@ public class DemoReentrantLock {
       Account source = Account.builder().balance(10000).build();
       Account target = Account.builder().balance(0).build();
 
-      Thread threadA = new Thread(() -> {
-        transfer_sync(source, target, 100);
-      }, "A");
-      Thread threadB = new Thread(() -> {
-        transfer_sync(source, target, 100);
-      }, "B");
+      Thread threadA =
+          new Thread(
+              () -> {
+                transfer_sync(source, target, 100);
+              },
+              "A");
+      Thread threadB =
+          new Thread(
+              () -> {
+                transfer_sync(source, target, 100);
+              },
+              "B");
 
       threadA.start();
       threadB.start();
@@ -112,21 +116,27 @@ public class DemoReentrantLock {
       Account source = Account.builder().balance(10000).build();
       Account target = Account.builder().balance(0).build();
 
-      Thread threadA = new Thread(() -> {
-        try {
-          transfer_lock(source, target, 100);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-      }, "A");
+      Thread threadA =
+          new Thread(
+              () -> {
+                try {
+                  transferLock(source, target, 100);
+                } catch (InterruptedException e) {
+                  throw new RuntimeException(e);
+                }
+              },
+              "A");
 
-      Thread threadB = new Thread(() -> {
-        try {
-          transfer_lock(source, target, 100);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-      }, "B");
+      Thread threadB =
+          new Thread(
+              () -> {
+                try {
+                  transferLock(source, target, 100);
+                } catch (InterruptedException e) {
+                  throw new RuntimeException(e);
+                }
+              },
+              "B");
 
       threadA.start();
       threadB.start();
@@ -142,8 +152,7 @@ public class DemoReentrantLock {
     @SneakyThrows(Exception.class)
     static void transfer_sync(Account source, Account target, int amt) {
       synchronized (source) {
-        log.info("\n 线程：{} \n 持有锁: {} \n 等待锁: {}\n", Thread.currentThread(), source,
-            target);
+        log.info("\n 线程：{} \n 持有锁: {} \n 等待锁: {}\n", Thread.currentThread(), source, target);
         synchronized (target) {
           if (source.getBalance() > amt) {
             source.setBalance(source.getBalance() - amt);
@@ -156,8 +165,7 @@ public class DemoReentrantLock {
 
     //  region reentrant lock
 
-
-    static void transfer_lock(Account source, Account target, int amount)
+    static void transferLock(Account source, Account target, int amount)
         throws InterruptedException {
       boolean isContinue = true;
       while (isContinue) {
@@ -170,8 +178,8 @@ public class DemoReentrantLock {
                 log.info("\n 开始转账操作\n ");
                 source.setBalance(source.getBalance() - amount);
                 target.setBalance(target.getBalance() + amount);
-                log.info("\n 结束转账操作 source:{} target:{}\n ", source.getBalance(),
-                    target.getBalance());
+                log.info(
+                    "\n 结束转账操作 source:{} target:{}\n ", source.getBalance(), target.getBalance());
                 isContinue = false;
               } finally {
                 log.info("\n {}释放锁 time:{}\n ", target.getLock(), System.currentTimeMillis());

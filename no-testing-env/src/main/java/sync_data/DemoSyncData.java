@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StopWatch;
 
 /**
  * @author jensen_deng
@@ -17,12 +18,25 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class DemoSyncData {
 
-  public static final int TOTAL = 1000; // 数据总量
-  public static final int PAGE_SIZE = 10;
+  public static final Integer TOTAL_NUMBER = 1000 * 1000;
+  public static final Integer PAGE_SIZE = 10;
+  public static Integer FIXED_THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
 
   public static void main(String[] args) {
-    synAllData(TOTAL, PAGE_SIZE);
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+
+    // 多线程 624s
+    //    syncDataThroughMultiThead(TOTAL, PAGE_SIZE);
+
+    // 单线程 621s
+    syncData(0, PAGE_SIZE);
+
+    stopWatch.stop();
+    log.info("Total spend time: {}", stopWatch.getTotalTimeSeconds());
   }
+
+  // region 多线程方式
 
   /**
    * 【多线程方式】数据
@@ -31,12 +45,12 @@ public class DemoSyncData {
    * @param pageSize 页码
    */
   @SneakyThrows
-  public static void synAllData(int total, int pageSize) {
+  public static void syncDataThroughMultiThead(int total, int pageSize) {
 
     // 定义原子变量 - 页数
     AtomicInteger pageIndex = new AtomicInteger(0);
     // 创建线程池
-    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
+    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(FIXED_THREAD_NUMBER);
 
     // 计算需要同步几次
     int times = total / pageSize;
@@ -52,7 +66,7 @@ public class DemoSyncData {
         () -> {
           int index = pageIndex.incrementAndGet();
           try {
-            multiFetchAndSaveDB(index, pageSize);
+            multiFetchAndSaveDatabase(index, pageSize);
           } catch (Exception e) {
             log.error("并发获取并保存数据异常：", e);
           }
@@ -67,9 +81,9 @@ public class DemoSyncData {
       if (task.get().equals(times) && task.isDone()) {
         LocalDateTime endLocalDateTime = LocalDateTime.now();
         log.info(
-            "【数据同步 - 存量】同步结束时间：{},总共耗时：{}分钟",
+            "【数据同步 - 存量】同步结束时间：{},总共耗时：{}秒",
             endLocalDateTime.format(formatter),
-            Duration.between(beginTime, endLocalDateTime).toMinutes());
+            Duration.between(beginTime, endLocalDateTime).toSeconds());
         shutdownAndAwaitTermination(fixedThreadPool);
       }
     }
@@ -113,12 +127,14 @@ public class DemoSyncData {
    * @param pageIndex 页面索引
    * @param pageSize 页面大小
    */
-  private static void multiFetchAndSaveDB(int pageIndex, int pageSize) {
+  private static void multiFetchAndSaveDatabase(int pageIndex, int pageSize) {
     log.info("【数据同步 - 存量】，第{}页同步,", pageIndex);
     List<Integer> data = mockGetData(pageIndex, pageSize);
 
     if (!CollectionUtils.isEmpty(data)) {
-      // TODO save to Database
+
+      mockSaveToDB();
+
       log.info("【数据同步 - 存量】，第{}页同步,同步成功", pageIndex);
       if (data.size() < pageSize) {
         log.info("【数据同步 - 存量】,第{}页同步,获取数据小于每页获取条数,证明已全部同步完毕!!!", pageIndex);
@@ -128,14 +144,56 @@ public class DemoSyncData {
     }
   }
 
+  // endregion
+
+  // region 单线程方式
+  @SneakyThrows
+  public static void syncData(Integer pageIndex, Integer pageSize) {
+    while (true) {
+
+      log.info("【数据同步 - 存量】，第{}次同步,", pageIndex);
+      List<Integer> data = mockGetData(pageIndex, pageSize);
+
+      // 当获取的数据不为空，且数据量不小于页大小
+      if (!CollectionUtils.isEmpty(data) && pageSize <= data.size()) {
+        mockSaveToDB();
+        log.info("【数据同步 - 存量】，第{}次同步,同步成功", pageIndex);
+
+        pageIndex += 1;
+      } else {
+        log.info("【数据同步 - 存量】,第{}次同步,获取数据为空,证明已全部同步完毕!!!", pageIndex);
+        break;
+      }
+    }
+  }
+
+  // endregion
+
+  // region mock
+
+  /** 模拟保存到数据库 */
+  @SneakyThrows
+  private static void mockSaveToDB() {
+    // TODO save to Database
+    Thread.sleep(5);
+  }
   /**
-   * 模拟得到数据
+   * 模拟从第三方得到数据
    *
    * @param pageIndex 页面索引
    * @param pageSize 页面大小
    * @return {@link List}<{@link Integer}>
    */
-  private static List<Integer> mockGetData(int pageIndex, int pageSize) {
-    return IntStream.rangeClosed(1, 10).boxed().toList();
+  private static List<Integer> mockGetData(Integer pageIndex, Integer pageSize) {
+    List<Integer> result = IntStream.rangeClosed(1, pageSize).boxed().toList();
+
+    // 模拟只同步指定页数就返回最后一页的数据
+    int times = TOTAL_NUMBER / PAGE_SIZE;
+    if (pageIndex.equals(times)) {
+      return IntStream.rangeClosed(1, pageSize - 1).boxed().toList();
+    }
+
+    return result;
   }
+  // endregion
 }
