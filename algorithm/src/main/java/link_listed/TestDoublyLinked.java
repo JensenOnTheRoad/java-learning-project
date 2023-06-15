@@ -7,6 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
+ * 双向链表
+ *
  * @author jensen_deng
  */
 public class TestDoublyLinked {

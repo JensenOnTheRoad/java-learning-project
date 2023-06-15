@@ -8,7 +8,7 @@ public class TestQuickSort {
   @Test
   @DisplayName("快速排序")
   void test() {
-    int[] array = {72, 6, 57, 88, 60, 42, 83, 73, 48, 85, 20, 2};
+    int[] array = {71, 6, 57, 88, 60, 42, 83, 73, 48, 85, 20, 2};
 
     for (int i = 0; i < array.length; i++) {
       System.out.print(array[i] + " ");

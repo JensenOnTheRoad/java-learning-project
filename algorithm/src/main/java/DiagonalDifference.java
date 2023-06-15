@@ -1,4 +1,5 @@
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 public class DiagonalDifference {
 
   @Test
+  @DisplayName("对角差分")
   void test() {
     int[][] arr = {{11, 2, 4}, {4, 5, 6}, {10, 8, -12}};
     int result = function(arr);
