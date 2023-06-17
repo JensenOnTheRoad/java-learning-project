@@ -55,6 +55,7 @@ public class Demo_ThreadLocal_Demo_ThisSystemDO {
   @DisplayName("创建ThreadLocal保存User对象")
   public void should_() {
     User user = new User("jack");
-    new Service1().service1(user);
+    Service1 service = new Service1();
+    service.service1(user);
   }
 }

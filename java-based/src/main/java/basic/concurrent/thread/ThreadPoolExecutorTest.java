@@ -13,7 +13,7 @@ import org.springframework.util.StopWatch;
  * @author jensen
  */
 @Slf4j
-public class TestThreadPoolExecutor {
+public class ThreadPoolExecutorTest {
   private static final int TASK_COUNT = 11; // 任务数
   private static final int CORE_POOL_SIZE = 10;
   private static final int MAXIMUM_POOL_SIZE = 10;

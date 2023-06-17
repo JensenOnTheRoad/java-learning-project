@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
+ * 两数之和
+ *
  * @author jensen_deng
  */
 public class SumOfTwoNumbers {
