@@ -19,6 +19,7 @@ public class ThreadPoolExecutorTest {
   private static final int MAXIMUM_POOL_SIZE = 10;
   private static final int KEEP_ALIVE_TIME = 5;
   private static final ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(10);
+  public static final RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.AbortPolicy();
 
   @SneakyThrows
   public static void main(String[] args) {
@@ -30,7 +31,8 @@ public class ThreadPoolExecutorTest {
             MAXIMUM_POOL_SIZE, // 最大线程数
             KEEP_ALIVE_TIME, // 非核心回收超时时间
             TimeUnit.SECONDS, // 超时时间单位
-            WORK_QUEUE); // 任务队列
+            WORK_QUEUE,
+            HANDLER); // 任务队列
 
     CountDownLatch countDownLatch = new CountDownLatch(TASK_COUNT);
 

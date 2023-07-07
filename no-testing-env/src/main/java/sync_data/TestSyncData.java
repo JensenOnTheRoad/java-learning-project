@@ -20,7 +20,7 @@ public class TestSyncData {
   private static final Integer TOTAL_NUMBER = 1000 * 1000;
   private static final Integer PAGE_SIZE = 10;
   private static final Integer PAGE_INDEX = 0;
-  private static final Integer FIXED_THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
+  private static final Integer FIXED_THREAD_NUMBER = Runtime.getRuntime().availableProcessors() + 1;
 
   /**
    * 单元测试是不支持多线程的，主线程结束之后，不管子线程有没有结束，都会强制退出。
@@ -38,7 +38,7 @@ public class TestSyncData {
    * <p>通过CountDownLatch来等待所有子线程执行完毕，才结束主线程。
    */
   @Test
-  @DisplayName("多线程 305s")
+  @DisplayName("多线程 百万级300s+")
   void test_sync_through_multi_threading() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -50,7 +50,7 @@ public class TestSyncData {
   }
 
   @Test
-  @DisplayName("单线程")
+  @DisplayName("单线程 百万级2400s+ ")
   void test_sync() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -91,9 +91,11 @@ public class TestSyncData {
         };
 
     // 提交到线程池
-    for (int i = 1; i <= times; i++) {
-      fixedThreadPool.submit(task);
-    }
+    IntStream.rangeClosed(1, times)
+        .forEach(
+            x -> {
+              fixedThreadPool.submit(task);
+            });
 
     // 阻塞等待线程池任务执行完
     countDownLatch.await();
