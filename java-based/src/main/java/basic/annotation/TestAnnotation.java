@@ -25,18 +25,18 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 @MyClass(description = "15")
-public class TestReentrantReadWriteLock {
+public class TestAnnotation {
 
   // 使用我们的自定义注解
   @MyField(description = "用户名", length = 12)
   private String username;
 
   @Test
-  @DisplayName("字段注解")
+  @DisplayName("字段注解,通过反射读取")
   public void testMyField() {
 
     // 获取类模板
-    Class<?> clazz = TestReentrantReadWriteLock.class;
+    Class<?> clazz = TestAnnotation.class;
 
     // 获取所有字段
     for (Field f : clazz.getDeclaredFields()) {
@@ -55,7 +55,7 @@ public class TestReentrantReadWriteLock {
   @Test
   @DisplayName("类注解")
   void name() {
-    Class<?> clazz = TestReentrantReadWriteLock.class;
+    Class<?> clazz = TestAnnotation.class;
     MyClass annotation = clazz.getAnnotation(MyClass.class);
     log.info("annotation.description() = {}", annotation.description());
   }
